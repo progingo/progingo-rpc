@@ -41,6 +41,14 @@
             <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
+
+
+        <!-- https://mvnrepository.com/artifact/io.etcd/jetcd-core -->
+        <dependency>
+            <groupId>io.etcd</groupId>
+            <artifactId>jetcd-core</artifactId>
+            <version>0.7.7</version>
+        </dependency>
     </dependencies>
 
 </project>

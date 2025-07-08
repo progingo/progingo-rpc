@@ -1,16 +1,23 @@
 package org.progingo.proxy;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import org.progingo.config.RpcApplication;
+import org.progingo.config.RpcConfig;
+import org.progingo.constant.RpcConstant;
 import org.progingo.model.RpcRequest;
 import org.progingo.model.RpcResponse;
+import org.progingo.model.ServiceMetaInfo;
+import org.progingo.registry.Registry;
+import org.progingo.registry.RegistryFactory;
 import org.progingo.serializer.Serializer;
 import org.progingo.serializer.SerializerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class ServiceProxy implements InvocationHandler {
 
@@ -27,8 +34,9 @@ public class ServiceProxy implements InvocationHandler {
         final Serializer serializer = SerializerFactory.getInstance(RpcApplication.getRpcConfig().getSerializer());
         System.out.println("服务代理:选择使用构造器:" + serializer);
         // 构造请求
+        String serviceName = method.getDeclaringClass().getName();
         RpcRequest rpcRequest = RpcRequest.builder()
-                .serviceName(method.getDeclaringClass().getName())
+                .serviceName(serviceName)
                 .methodName(method.getName())
                 .parameterTypes(method.getParameterTypes())
                 .args(args)
@@ -36,12 +44,28 @@ public class ServiceProxy implements InvocationHandler {
         System.out.println("服务代理:构造出的请求:" + rpcRequest);
 
         try {
+            // 从注册中心获取服务提供者请求地址
+            System.out.println("服务代理:从注册中心获取服务");
+            RpcConfig rpcConfig = RpcApplication.getRpcConfig();
+            Registry registry = RegistryFactory.getInstance(rpcConfig.getRegistryConfig().getRegistry());
+            System.out.println("服务代理:获取到注册中心配置=" + registry);
+
+            ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
+            serviceMetaInfo.setServiceName(serviceName);
+            serviceMetaInfo.setServiceVersion(RpcConstant.DEFAULT_SERVICE_VERSION);
+            List<ServiceMetaInfo> serviceMetaInfoList = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
+            if (CollUtil.isEmpty(serviceMetaInfoList)) {
+                throw new RuntimeException("暂无服务地址");
+            }
+            // 暂时先取第一个
+            ServiceMetaInfo selectedServiceMetaInfo = serviceMetaInfoList.get(0);
+            System.out.println("服务代理:使用服务地址=" + selectedServiceMetaInfo.getServiceAddress());
             // 序列化
+            System.out.println("服务代理:开始序列化");
             byte[] bodyBytes = serializer.serialize(rpcRequest);
             // 发送请求
-            // todo 这里地址被硬编码了（需要使用注册中心和服务发现机制解决）
             System.out.println("服务代理:调用URL");
-            try (HttpResponse httpResponse = HttpRequest.post("http://localhost:8080")
+            try (HttpResponse httpResponse = HttpRequest.post(selectedServiceMetaInfo.getServiceAddress())
                     .body(bodyBytes)
                     .execute()) {
                 byte[] result = httpResponse.bodyBytes();

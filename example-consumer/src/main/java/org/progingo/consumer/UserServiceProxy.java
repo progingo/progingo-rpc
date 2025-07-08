@@ -16,6 +16,7 @@ import java.io.IOException;
  * 静态代理
  * 静态代理类的作用是给消费者使用，并通过HTTP请求调用服务提供者。在消费者眼里就是调用到了服务提供者提供的实现，所以是代理
  */
+@Deprecated
 public class UserServiceProxy implements UserService {
 
     public User getUser(User user) {

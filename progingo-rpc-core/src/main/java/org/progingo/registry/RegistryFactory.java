@@ -25,7 +25,7 @@ public class RegistryFactory {
      * @return
      */
     public static Registry getInstance(String key) {
-        System.out.println("注册中心工厂:获取注册中心实例,key" + key);
+        System.out.println("注册中心工厂:获取注册中心实例,key=" + key);
         return SpiLoader.getInstance(Registry.class, key);
     }
 
