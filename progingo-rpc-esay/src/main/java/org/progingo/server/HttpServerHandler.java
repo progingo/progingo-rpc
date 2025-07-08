@@ -24,10 +24,11 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
         final Serializer serializer = new JdkSerializer();
 
         // 记录日志
-        System.out.println("Received request: " + request.method() + " " + request.uri());
+        System.out.println("请求处理器收到请求：: " + request.method() + " " + request.uri());
 
         // 异步处理 HTTP 请求
         request.bodyHandler(body -> {
+            //反序列化拿到请求
             byte[] bytes = body.getBytes();
             RpcRequest rpcRequest = null;
             try {
