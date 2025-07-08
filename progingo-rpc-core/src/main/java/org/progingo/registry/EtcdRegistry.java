@@ -1,12 +1,14 @@
 package org.progingo.registry;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.cron.CronUtil;
 import cn.hutool.cron.task.Task;
 import cn.hutool.json.JSONUtil;
 import io.etcd.jetcd.*;
 import io.etcd.jetcd.options.GetOption;
 import io.etcd.jetcd.options.PutOption;
+import io.etcd.jetcd.watch.WatchEvent;
 import org.progingo.config.RegistryConfig;
 import org.progingo.model.ServiceMetaInfo;
 
@@ -33,6 +35,15 @@ public class EtcdRegistry implements Registry {
      */
     private static final String ETCD_ROOT_PATH = "/rpc/";
 
+    /**
+     * 注册中心服务缓存
+     */
+    private final RegistryServiceCache registryServiceCache = new RegistryServiceCache();
+
+    /**
+     * 正在监听的 key 集合
+     */
+    private final Set<String> watchingKeySet = new ConcurrentHashSet<>();
     @Override
     public void init(RegistryConfig registryConfig) {
         System.out.println("注册中心:初始化");
@@ -81,6 +92,13 @@ public class EtcdRegistry implements Registry {
 
     public List<ServiceMetaInfo> serviceDiscovery(String serviceKey) {
         System.out.println("注册中心:服务发现");
+        // 优先从缓存获取服务
+        List<ServiceMetaInfo> cachedServiceMetaInfoList = registryServiceCache.readCache();
+        if (cachedServiceMetaInfoList != null && !cachedServiceMetaInfoList.isEmpty()) {
+            System.out.println("注册中心:从缓存获取到服务");
+            return cachedServiceMetaInfoList;
+        }
+        System.out.println("注册中心:无缓存,从注册中心发现");
         // 前缀搜索，结尾一定要加 '/'
         String searchPrefix = ETCD_ROOT_PATH + serviceKey + "/";
 
@@ -96,12 +114,17 @@ public class EtcdRegistry implements Registry {
                     .getKvs();
             System.out.println("注册中心:发现服务数量:" + keyValues.size());
             // 解析服务信息
-            return keyValues.stream()
+            List<ServiceMetaInfo> serviceMetaInfoList = keyValues.stream()
                     .map(keyValue -> {
                         String value = keyValue.getValue().toString(StandardCharsets.UTF_8);
                         return JSONUtil.toBean(value, ServiceMetaInfo.class);
                     })
                     .collect(Collectors.toList());
+
+            // 写入服务缓存
+            System.out.println("注册中心:写入缓存");
+            registryServiceCache.writeCache(serviceMetaInfoList);
+            return serviceMetaInfoList;
         } catch (Exception e) {
             throw new RuntimeException("获取服务列表失败", e);
         }
@@ -156,5 +179,35 @@ public class EtcdRegistry implements Registry {
         // 支持秒级别定时任务
         CronUtil.setMatchSecond(true);
         CronUtil.start();
+    }
+
+    /**
+     * 监听（消费端）
+     *
+     * @param serviceNodeKey
+     */
+    @Override
+    public void watch(String serviceNodeKey) {
+        System.out.println("注册中心:使用监听器");
+        Watch watchClient = client.getWatchClient();
+        // 之前未被监听，开启监听
+        boolean newWatch = watchingKeySet.add(serviceNodeKey);
+        if (newWatch) {
+            watchClient.watch(ByteSequence.from(serviceNodeKey, StandardCharsets.UTF_8), response -> {
+                for (WatchEvent event : response.getEvents()) {
+                    switch (event.getEventType()) {
+                        // key 删除时触发
+                        case DELETE:
+                            System.out.println("注册中心:监听器:清理服务缓存");
+                            // 清理注册服务缓存
+                            registryServiceCache.clearCache();
+                            break;
+                        case PUT:
+                        default:
+                            break;
+                    }
+                }
+            });
+        }
     }
 }
