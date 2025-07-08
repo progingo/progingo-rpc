@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>org.progingo</groupId>
-            <artifactId>progingo-rpc-esay</artifactId>
+            <artifactId>progingo-rpc-core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

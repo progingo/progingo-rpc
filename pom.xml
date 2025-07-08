@@ -13,6 +13,7 @@
         <module>example-consumer</module>
         <module>example-provider</module>
         <module>progingo-rpc-esay</module>
+        <module>progingo-rpc-core</module>
     </modules>
 
     <properties>
