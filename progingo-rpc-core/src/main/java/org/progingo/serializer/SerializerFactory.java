@@ -1,7 +1,7 @@
 package org.progingo.serializer;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.progingo.spi.SpiLoader;
+
 
 /**
  * 序列化器工厂（用于获取序列化器对象）
@@ -9,20 +9,11 @@ import java.util.Map;
  */
 public class SerializerFactory {
 
-    /**
-     * 序列化映射（用于实现单例）
-     */
-    private static final Map<String, Serializer> KEY_SERIALIZER_MAP = new HashMap<String, Serializer>() {{
-        put(SerializerKeys.JDK, new JdkSerializer());
-        put(SerializerKeys.JSON, new JsonSerializer());
-        put(SerializerKeys.KRYO, new KryoSerializer());
-        put(SerializerKeys.HESSIAN, new HessianSerializer());
-    }};
-
-    /**
-     * 默认序列化器
-     */
-    private static final Serializer DEFAULT_SERIALIZER = KEY_SERIALIZER_MAP.get("jdk");
+    static {
+        //让SPI加载器去根据配置文件加载序列化器
+        System.out.println("序列化工厂:序列化器工厂加载序列化器");
+        SpiLoader.load(Serializer.class);
+    }
 
     /**
      * 获取实例
@@ -31,7 +22,8 @@ public class SerializerFactory {
      * @return
      */
     public static Serializer getInstance(String key) {
-        return KEY_SERIALIZER_MAP.getOrDefault(key, DEFAULT_SERIALIZER);
+        System.out.println("序列化工厂:获取序列化实例");
+        return SpiLoader.getInstance(Serializer.class, key);
     }
 
 }

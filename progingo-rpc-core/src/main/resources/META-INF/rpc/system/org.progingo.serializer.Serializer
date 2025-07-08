@@ -1,0 +1,4 @@
+jdk=org.progingo.serializer.JdkSerializer
+hessian=org.progingo.serializer.HessianSerializer
+json=org.progingo.serializer.JsonSerializer
+kryo=org.progingo.serializer.KryoSerializer

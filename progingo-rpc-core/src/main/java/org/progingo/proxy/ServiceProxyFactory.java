@@ -14,10 +14,12 @@ public class ServiceProxyFactory {
      * @return
      */
     public static <T> T getProxy(Class<T> serviceClass) {
+        System.out.println("代理工厂:进入代理工厂");
         if (RpcApplication.getRpcConfig().isMock()) {
+            System.out.println("代理工厂:获取到Mock代理");
             return getMockProxy(serviceClass);
         }
-
+        System.out.println("代理工厂:获取到真实代理");
         return (T) Proxy.newProxyInstance(
                 serviceClass.getClassLoader(),
                 new Class[]{serviceClass},

@@ -27,6 +27,7 @@ public class RpcApplication {
      * 初始化
      */
     public static void init() {
+        System.out.println("RPC框架应用:初始化配置");
         RpcConfig newRpcConfig;
         try {
             newRpcConfig = ConfigUtils.loadConfig(RpcConfig.class, RpcConstant.DEFAULT_CONFIG_PREFIX);
@@ -43,6 +44,7 @@ public class RpcApplication {
      * @return
      */
     public static RpcConfig getRpcConfig() {
+        System.out.println("RPC框架应用:获取配置");
         if (rpcConfig == null) {
             synchronized (RpcApplication.class) {
                 if (rpcConfig == null) {

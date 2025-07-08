@@ -3,7 +3,6 @@ package org.progingo.serializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.progingo.model.RpcRequest;
 import org.progingo.model.RpcResponse;
-import org.progingo.serializer.Serializer;
 
 import java.io.IOException;
 

@@ -19,6 +19,7 @@ public class LocalRegistry {
      * @param implClass
      */
     public static void register(String serviceName, Class<?> implClass) {
+        System.out.println("服务注册中心:注册服务:" + serviceName);
         map.put(serviceName, implClass);
     }
 
@@ -29,6 +30,7 @@ public class LocalRegistry {
      * @return
      */
     public static Class<?> get(String serviceName) {
+        System.out.println("服务注册中心:获取服务:" + serviceName);
         return map.get(serviceName);
     }
 
@@ -38,6 +40,7 @@ public class LocalRegistry {
      * @param serviceName
      */
     public static void remove(String serviceName) {
+        System.out.println("服务注册中心:移除服务:" + serviceName);
         map.remove(serviceName);
     }
 }

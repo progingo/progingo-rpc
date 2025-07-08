@@ -1,10 +1,8 @@
 package org.progingo.consumer;
 
-import org.progingo.config.RpcConfig;
 import org.progingo.model.User;
 import org.progingo.proxy.ServiceProxyFactory;
 import org.progingo.service.UserService;
-import org.progingo.utils.ConfigUtils;
 
 /**
  * 简易服务消费者示例
@@ -28,8 +26,7 @@ public class ConsumerExample {
             System.out.println("user == null");
         }
         //检测获取到的是代理对象还是Mock代理
-        long number = userService.getNumber();
-        System.out.println(number);
+        System.out.println(userService.getNumber());
 
 
     }
