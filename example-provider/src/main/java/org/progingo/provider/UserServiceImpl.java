@@ -8,6 +8,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(User user) {
         System.out.println("用户名：" + user.getName());
+        user.setName(user.getName() + "(代理)");
         return user;
     }
 }
