@@ -26,7 +26,7 @@ public class ConsumerExample {
             System.out.println("user == null");
         }
         //检测获取到的是代理对象还是Mock代理
-        System.out.println(userService.getNumber());
+        //System.out.println(userService.getNumber());
 
 
     }
