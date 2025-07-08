@@ -1,0 +1,1 @@
+etcd=org.progingo.registry.EtcdRegistry

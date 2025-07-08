@@ -22,7 +22,7 @@ public class SerializerFactory {
      * @return
      */
     public static Serializer getInstance(String key) {
-        System.out.println("序列化工厂:获取序列化实例");
+        System.out.println("序列化工厂:获取序列化实例,key=" + key);
         return SpiLoader.getInstance(Serializer.class, key);
     }
 

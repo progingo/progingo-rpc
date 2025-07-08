@@ -1,12 +1,14 @@
 package org.progingo.config;
 
 import lombok.Data;
+import lombok.ToString;
 import org.progingo.serializer.SerializerKeys;
 
 /**
  * RPC 框架配置
  */
 @Data
+@ToString
 public class RpcConfig {
     /**
      * 名称

@@ -2,6 +2,8 @@ package org.progingo.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.progingo.constant.RpcConstant;
+import org.progingo.registry.Registry;
+import org.progingo.registry.RegistryFactory;
 import org.progingo.utils.ConfigUtils;
 
 /**
@@ -19,8 +21,14 @@ public class RpcApplication {
      * @param newRpcConfig
      */
     public static void init(RpcConfig newRpcConfig) {
+        System.out.println("RPC框架应用:使用配置=" + newRpcConfig);
         rpcConfig = newRpcConfig;
         log.info("rpc init, config = {}", newRpcConfig.toString());
+        // 注册中心初始化
+        RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
+        Registry registry = RegistryFactory.getInstance(registryConfig.getRegistry());
+        registry.init(registryConfig);
+        log.info("registry init, config = {}", registryConfig);
     }
 
     /**
