@@ -20,6 +20,8 @@ public class RpcRequest implements Serializable {
      */
     private String serviceName;
 
+    private String serviceVersion;
+
     /**
      * 方法名称
      */
