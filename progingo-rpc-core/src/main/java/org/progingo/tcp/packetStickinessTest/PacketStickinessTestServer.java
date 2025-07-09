@@ -1,4 +1,4 @@
-package org.progingo.tcp;
+package org.progingo.tcp.packetStickinessTest;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.net.NetServer;
