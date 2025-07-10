@@ -7,9 +7,8 @@ import org.progingo.model.ServiceMetaInfo;
 import org.progingo.registry.LocalRegistry;
 import org.progingo.registry.Registry;
 import org.progingo.registry.RegistryFactory;
-import org.progingo.server.HttpServer;
-import org.progingo.server.VertxHttpServer;
 import org.progingo.service.UserService;
+import org.progingo.tcp.VertxTcpServer;
 
 /**
  * 服务提供者示例
@@ -41,9 +40,8 @@ public class ProviderExample {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        // 启动 web 服务
-        VertxHttpServer vertxHttpServer = new VertxHttpServer();
-        vertxHttpServer.doStart(RpcApplication.getRpcConfig().getServerPort());//自己提供服务的端口
+        // 启动 TCP 服务
+        VertxTcpServer vertxTcpServer = new VertxTcpServer();
+        vertxTcpServer.doStart(RpcApplication.getRpcConfig().getServerPort());
     }
 }
