@@ -9,6 +9,8 @@ import io.vertx.core.net.NetClient;
 import org.progingo.config.RpcApplication;
 import org.progingo.config.RpcConfig;
 import org.progingo.constant.RpcConstant;
+import org.progingo.loadbalancer.LoadBalancer;
+import org.progingo.loadbalancer.LoadBalancerFactory;
 import org.progingo.model.RpcRequest;
 import org.progingo.model.RpcResponse;
 import org.progingo.model.ServiceMetaInfo;
@@ -21,7 +23,9 @@ import org.progingo.tcp.VertxTcpClient;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ServiceProxy implements InvocationHandler {
 
@@ -61,9 +65,14 @@ public class ServiceProxy implements InvocationHandler {
         if (CollUtil.isEmpty(serviceMetaInfoList)) {
             throw new RuntimeException("暂无服务地址");
         }
-        // 暂时先取第一个
-        ServiceMetaInfo selectedServiceMetaInfo = serviceMetaInfoList.get(0);
-
+        // 负载均衡
+        System.out.println("服务代理:使用负载均衡");
+        LoadBalancer loadBalancer = LoadBalancerFactory.getInstance(rpcConfig.getLoadBalancer());
+        // 将调用方法名（请求路径）作为负载均衡参数
+        Map<String, Object> requestParams = new HashMap<>();
+        requestParams.put("methodName", rpcRequest.getMethodName());
+        ServiceMetaInfo selectedServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfoList);
+        System.out.println("服务代理:负载均衡器选择的服务信息=" + selectedServiceMetaInfo);
         // 发送 TCP 请求
         System.out.println("服务代理:通过TCP客户端发送请求");
         RpcResponse rpcResponse = VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo);

@@ -1,0 +1,3 @@
+roundRobin=org.progingo.loadbalancer.RoundRobinLoadBalancer
+random=org.progingo.loadbalancer.RandomLoadBalancer
+consistentHash=org.progingo.loadbalancer.ConsistentHashLoadBalancer
