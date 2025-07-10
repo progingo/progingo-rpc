@@ -3,6 +3,7 @@ package org.progingo.config;
 import lombok.Data;
 import lombok.ToString;
 import org.progingo.fault.retry.RetryStrategyKeys;
+import org.progingo.fault.tolerant.TolerantStrategyKeys;
 import org.progingo.loadbalancer.LoadBalancerKeys;
 import org.progingo.serializer.SerializerKeys;
 
@@ -52,4 +53,8 @@ public class RpcConfig {
      * 重试策略
      */
     private String retryStrategy = RetryStrategyKeys.NO;
+    /**
+     * 容错策略
+     */
+    private String tolerantStrategy = TolerantStrategyKeys.FAIL_FAST;
 }

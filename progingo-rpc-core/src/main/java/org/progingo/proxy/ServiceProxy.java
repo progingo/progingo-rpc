@@ -7,6 +7,8 @@ import org.progingo.config.RpcConfig;
 import org.progingo.constant.RpcConstant;
 import org.progingo.fault.retry.RetryStrategy;
 import org.progingo.fault.retry.RetryStrategyFactory;
+import org.progingo.fault.tolerant.TolerantStrategy;
+import org.progingo.fault.tolerant.TolerantStrategyFactory;
 import org.progingo.loadbalancer.LoadBalancer;
 import org.progingo.loadbalancer.LoadBalancerFactory;
 import org.progingo.model.RpcRequest;
@@ -71,13 +73,22 @@ public class ServiceProxy implements InvocationHandler {
         ServiceMetaInfo selectedServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfoList);
         System.out.println("服务代理:负载均衡器选择的服务信息=" + selectedServiceMetaInfo);
         // 使用重试机制
-        RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
-        System.out.println("服务代理:选用重试机制为:" + retryStrategy);
-        // 发送 TCP 请求
-        System.out.println("服务代理:通过TCP客户端发送请求");
-        RpcResponse rpcResponse = retryStrategy.doRetry(() ->
-                VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo)
-        );
+        RpcResponse rpcResponse;
+        Thread.sleep(5000);
+        try {
+            RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
+            System.out.println("服务代理:选用重试机制为:" + retryStrategy);
+            // 发送 TCP 请求
+            System.out.println("服务代理:通过TCP客户端发送请求");
+            rpcResponse = retryStrategy.doRetry(() ->
+                    VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo)
+            );
+        } catch (Exception e){
+            // 容错机制
+            TolerantStrategy tolerantStrategy = TolerantStrategyFactory.getInstance(rpcConfig.getTolerantStrategy());
+            rpcResponse = tolerantStrategy.doTolerant(null, e);
+        }
+
         return rpcResponse.getData();
 
     }

@@ -1,0 +1,2 @@
+failFast=org.progingo.fault.tolerant.FailFastTolerantStrategy
+failSafe=org.progingo.fault.tolerant.FailSafeTolerantStrategy
