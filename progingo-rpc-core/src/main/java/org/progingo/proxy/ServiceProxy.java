@@ -74,7 +74,6 @@ public class ServiceProxy implements InvocationHandler {
         System.out.println("服务代理:负载均衡器选择的服务信息=" + selectedServiceMetaInfo);
         // 使用重试机制
         RpcResponse rpcResponse;
-        Thread.sleep(5000);
         try {
             RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
             System.out.println("服务代理:选用重试机制为:" + retryStrategy);

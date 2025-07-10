@@ -78,7 +78,6 @@ public class VertxTcpClient {
                                     ProtocolMessage<RpcResponse> rpcResponseProtocolMessage =
                                             (ProtocolMessage<RpcResponse>) ProtocolMessageDecoder.decode(buffer);
                                     System.out.println("TCP请求客户端:响应解码成功" + rpcResponseProtocolMessage);
-                                    System.out.println("TCP请求客户端:开始异步反序列化");
                                     responseFuture.complete(rpcResponseProtocolMessage.getBody());
                                 } catch (IOException e) {
                                     throw new RuntimeException("协议消息解码错误");

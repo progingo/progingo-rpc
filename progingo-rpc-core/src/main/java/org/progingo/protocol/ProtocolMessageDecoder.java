@@ -46,6 +46,7 @@ public class ProtocolMessageDecoder {
             throw new RuntimeException("序列化消息的协议不存在");
         }
         Serializer serializer = SerializerFactory.getInstance(serializerEnum.getValue());
+        System.out.println("TCP解码器:获取到当前使用的序列化器为=" + serializer);
         ProtocolMessageTypeEnum messageTypeEnum = ProtocolMessageTypeEnum.getEnumByKey(header.getType());
         if (messageTypeEnum == null) {
             throw new RuntimeException("序列化消息的类型不存在");
