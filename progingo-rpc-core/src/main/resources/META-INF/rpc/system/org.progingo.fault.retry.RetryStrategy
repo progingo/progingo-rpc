@@ -1,0 +1,3 @@
+no=org.progingo.fault.retry.NoRetryStrategy
+fixedInterval=org.progingo.fault.retry.FixedIntervalRetryStrategy
+exponential=org.progingo.fault.retry.ExponentialBackoffRetryStrategy

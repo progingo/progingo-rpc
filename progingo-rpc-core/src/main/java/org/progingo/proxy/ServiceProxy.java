@@ -1,20 +1,17 @@
 package org.progingo.proxy;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.IdUtil;
 
-import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.net.NetClient;
 import org.progingo.config.RpcApplication;
 import org.progingo.config.RpcConfig;
 import org.progingo.constant.RpcConstant;
+import org.progingo.fault.retry.RetryStrategy;
+import org.progingo.fault.retry.RetryStrategyFactory;
 import org.progingo.loadbalancer.LoadBalancer;
 import org.progingo.loadbalancer.LoadBalancerFactory;
 import org.progingo.model.RpcRequest;
 import org.progingo.model.RpcResponse;
 import org.progingo.model.ServiceMetaInfo;
-import org.progingo.protocol.*;
 import org.progingo.registry.Registry;
 import org.progingo.registry.RegistryFactory;
 import org.progingo.serializer.Serializer;
@@ -73,9 +70,14 @@ public class ServiceProxy implements InvocationHandler {
         requestParams.put("methodName", rpcRequest.getMethodName());
         ServiceMetaInfo selectedServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfoList);
         System.out.println("服务代理:负载均衡器选择的服务信息=" + selectedServiceMetaInfo);
+        // 使用重试机制
+        RetryStrategy retryStrategy = RetryStrategyFactory.getInstance(rpcConfig.getRetryStrategy());
+        System.out.println("服务代理:选用重试机制为:" + retryStrategy);
         // 发送 TCP 请求
         System.out.println("服务代理:通过TCP客户端发送请求");
-        RpcResponse rpcResponse = VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo);
+        RpcResponse rpcResponse = retryStrategy.doRetry(() ->
+                VertxTcpClient.doRequest(rpcRequest, selectedServiceMetaInfo)
+        );
         return rpcResponse.getData();
 
     }
