@@ -28,8 +28,9 @@ public class TcpServerHandler implements Handler<NetSocket> {
     public void handle(NetSocket netSocket) {
         System.out.println(new Date() + "=================================");
         System.out.println("TCP请求处理器:调用了TCP请求处理器");
-        // 处理连接
-        netSocket.handler(buffer -> {
+
+        TcpBufferHandlerWrapper bufferHandlerWrapper = new TcpBufferHandlerWrapper(buffer -> {
+            // 处理请求代码
             // 接受请求，解码
             ProtocolMessage<RpcRequest> protocolMessage;
             try {
@@ -67,7 +68,9 @@ public class TcpServerHandler implements Handler<NetSocket> {
             } catch (IOException e) {
                 throw new RuntimeException("协议消息编码错误");
             }
-            System.out.println(new Date() + "=============================处理结束");
+
         });
+        netSocket.handler(bufferHandlerWrapper);
+        System.out.println(new Date() + "=============================处理结束");
     }
 }
