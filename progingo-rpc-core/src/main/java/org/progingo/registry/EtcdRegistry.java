@@ -64,14 +64,15 @@ public class EtcdRegistry implements Registry {
         Lease leaseClient = client.getLeaseClient();
 
         // 创建一个 30 秒的租约
-        long leaseId = leaseClient.grant(30).get().getID();
+        long leaseTime = 30l;
+        long leaseId = leaseClient.grant(leaseTime).get().getID();
 
         // 设置要存储的键值对
         String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
         ByteSequence key = ByteSequence.from(registerKey, StandardCharsets.UTF_8);
         ByteSequence value = ByteSequence.from(JSONUtil.toJsonStr(serviceMetaInfo), StandardCharsets.UTF_8);
 
-        System.out.println("注册中心:服务注册:key=" + registerKey + ",value=" + JSONUtil.toJsonStr(serviceMetaInfo) + ",租约时间=" + leaseId);
+        System.out.println("注册中心:服务注册:key=" + registerKey + ",value=" + JSONUtil.toJsonStr(serviceMetaInfo) + ",租约时间=" + leaseTime);
 
         // 将键值对与租约关联起来，并设置过期时间
         PutOption putOption = PutOption.builder().withLeaseId(leaseId).build();
