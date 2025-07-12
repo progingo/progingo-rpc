@@ -2,6 +2,10 @@ package org.progingo.spi;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.progingo.fault.retry.RetryStrategy;
+import org.progingo.fault.tolerant.TolerantStrategy;
+import org.progingo.loadbalancer.LoadBalancer;
+import org.progingo.registry.Registry;
 import org.progingo.serializer.Serializer;
 
 import java.io.BufferedReader;
@@ -43,7 +47,12 @@ public class SpiLoader {
     /**
      * 动态加载的类列表
      */
-    private static final List<Class<?>> LOAD_CLASS_LIST = Arrays.asList(Serializer.class);
+    private static final List<Class<?>> LOAD_CLASS_LIST = Arrays.asList(
+            Serializer.class,
+            Registry.class,
+            LoadBalancer.class,
+            TolerantStrategy.class,
+            RetryStrategy.class);
 
     /**
      * 加载所有类型
